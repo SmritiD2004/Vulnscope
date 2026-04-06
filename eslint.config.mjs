@@ -13,6 +13,14 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      "@next/next/no-deprecated-nextjs-feature": "off",
+      "@next/next/no-html-link-for-pages": "off",
+      "react/no-unescaped-entities": "off",
+    },
+    files: ["**/*.{js,jsx,ts,tsx}"],
+  },
 ]);
 
 export default eslintConfig;

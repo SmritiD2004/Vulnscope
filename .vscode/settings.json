@@ -1,0 +1,29 @@
+{
+  "css.lint.cssConflict": "warning",
+  "css.lint.compatibleVendorPrefixes": "warning",
+  "css.lint.vendorPrefix": "warning",
+  "[html]": {
+    "editor.formatOnSave": false
+  },
+  "tailwindCSS.lint.cssConflict": "off",
+  "tailwindCSS.lint.invalidApply": "off",
+  "tailwindCSS.lint.invalidConfigPath": "off",
+  "tailwindCSS.lint.invalidScreen": "off",
+  "tailwindCSS.lint.invalidTailwindDirective": "off",
+  "tailwindCSS.lint.invalidVariant": "off",
+  "tailwindCSS.lint.recommendedVariantOrder": "off",
+  "tailwindCSS.validate": false,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
+

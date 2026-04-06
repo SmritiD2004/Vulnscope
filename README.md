@@ -1,22 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VulnScope — Website Frontend
 
-## Getting Started
+Automated Web Application Penetration Testing & Vulnerability Reporting Framework
 
-First, run the development server:
+## Stack
+- Next.js 15 (App Router)
+- TypeScript 5
+- Tailwind CSS 4
+- Framer Motion 12
+- shadcn/ui
+- Deployed on Vercel
+
+## Local Development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev   # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Build
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+npm start
+```
+
+## Deploy
+
+Connect repo to Vercel. Set environment variables:
+- `NEXT_PUBLIC_GITHUB_URL` — Link to your GitHub repository
+- `NEXT_PUBLIC_REPORT_URL` — Link to PDF report (or `#` if not available)
+
+## Project Structure
+
+```
+vulnscope/
+├── app/
+│   ├── layout.tsx        # Root layout with Navbar & Footer
+│   ├── page.tsx          # Home page with sections
+│   └── globals.css       # Global styles
+├── components/
+│   ├── navbar.tsx        # Fixed navigation with mobile menu
+│   ├── hero.tsx          # Hero section with terminal demo
+│   ├── terminal-demo.tsx # Animated terminal
+│   ├── about.tsx         # Problem statement
+│   ├── pipeline.tsx      # Attack pipeline stages
+│   ├── tools.tsx         # Filterable tools grid
+│   ├── research.tsx      # Research domains
+│   ├── owasp.tsx         # OWASP Top 10 coverage
+│   └── footer.tsx        # Footer
+├── lib/
+│   ├── tools-data.ts     # Tool definitions
+│   ├── pipeline-data.ts  # Pipeline steps
+│   ├── research-data.ts  # Research domains
+│   ├── constants.ts      # Environment constants
+│   └── utils.ts          # Utility functions
+├── public/               # Static assets
+├── tailwind.config.ts    # Tailwind configuration
+└── tsconfig.json         # TypeScript configuration
+```
+
+## Features
+
+- **Responsive Design** — Mobile-first, optimized for all screen sizes
+- **Accessible** — WCAG AA compliant with semantic HTML & ARIA labels
+- **Animated** — Framer Motion for smooth interactions
+- **Dark Theme** — Custom color palette optimized for readability
+- **Terminal Animation** — Animated demo showing the command execution
+- **Filter Functionality** — Interactive tool filtering by category
+- **Smooth Scroll** — Section-based navigation with scroll detection
+
+## License
+
+© 2024–25 Final Year Engineering Project. All rights reserved.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 

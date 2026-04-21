@@ -1,42 +1,47 @@
-/**
- * Dashboard Layout
- * Wraps all dashboard pages with sidebar and top navigation
- */
-
+// app/dashboard/layout.tsx
 "use client";
 
-import React, { useState } from "react";
-import { TopNav } from "@/components/vulnscope/layout/top-nav";
-import { Sidebar } from "@/components/vulnscope/layout/sidebar";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/store/useAuth";
+import { useDashboard } from "@/lib/store/useDashboard";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+import { LogOut } from "lucide-react";
 
-// This layout completely replaces the root layout for dashboard routes
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { logout } = useAuth();
+  const { initialize, initialized } = useDashboard();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!initialized) {
+      initialize();
+    }
+  }, [initialize, initialized]);
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/");
+  };
 
   return (
-    <div className="flex flex-col h-screen bg-bg-primary">
-      {/* Top Navigation - Fixed */}
-      <TopNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-
-      {/* Main Content Area with Sidebar */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar - Fixed */}
-        <Sidebar
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-        />
-
-        {/* Page Content - Scrollable */}
-        <main className="flex-1 overflow-y-auto md:ml-64">
-          <div className="p-6 min-h-full">
-            {children}
+    <ProtectedRoute>
+      <div className="flex min-h-screen bg-bg-primary">
+        <DashboardSidebar />
+        <div className="flex-1 ml-64">
+          <div className="flex justify-end p-4 border-b border-slate-800">
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1.5 text-sm text-muted hover:text-primary"
+            >
+              <LogOut size={16} />
+              Logout
+            </button>
           </div>
-        </main>
+          <main className="p-8">{children}</main>
+        </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

@@ -1,137 +1,136 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Menu, X, Download } from "lucide-react";
+import { Menu, Shield, X } from "lucide-react";
 
-const NAV_LINKS = [
-  { label: "Features", href: "#features" },
-  { label: "How It Works", href: "#pipeline" },
-  { label: "Docs", href: "/docs" },
-  { label: "Dashboard", href: "/dashboard" },
+const sectionLinks = [
+  { label: "About", href: "#about", id: "about" },
+  { label: "Pipeline", href: "#pipeline", id: "pipeline" },
+  { label: "Research", href: "#research", id: "research" },
 ];
 
-export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
+function renderNavItems(activeSection: string, onNavigate: () => void): React.ReactNode {
+  return (
+    <>
+      {sectionLinks.map((link) => (
+        <Link
+          key={link.id}
+          href={link.href}
+          onClick={onNavigate}
+          className={`text-sm transition-colors ${
+            activeSection === link.id ? "text-amber" : "text-muted hover:text-primary"
+          }`}
+        >
+          {link.label}
+        </Link>
+      ))}
+      <Link
+        href="/auth/login"
+        onClick={onNavigate}
+        className="text-sm text-muted transition-colors hover:text-primary"
+      >
+        Login
+      </Link>
+    </>
+  );
+}
+
+export default function Navbar(): React.ReactElement {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
+  const sections = useMemo(() => ["hero", ...sectionLinks.map((item) => item.id), "owasp"], []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setIsScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
-    const sections = ["hero", "about", "pipeline", "tools", "research"];
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+        if (visible?.target.id) {
+          setActiveSection(visible.target.id);
+        }
       },
-      { threshold: 0.4 }
+      {
+        threshold: [0.15, 0.45, 0.7],
+        rootMargin: "-20% 0px -55% 0px",
+      }
     );
 
     sections.forEach((id) => {
-      const elem = document.getElementById(id);
-      if (elem) observer.observe(elem);
+      const element = document.getElementById(id);
+      if (element) observer.observe(element);
     });
 
     return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = () => setMobileOpen(false);
-    if (mobileOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [mobileOpen]);
+  }, [sections]);
 
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-slate-950/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.8)] border-b border-slate-700"
-          : "bg-slate-950 border-b border-slate-700"
+          ? "border-b border-amber-dim/60 bg-bg-primary/80 backdrop-blur-xl"
+          : "bg-transparent"
       }`}
-      aria-label="Main navigation"
+      aria-label="Landing navigation"
     >
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="font-bold text-lg tracking-tight">
-          <span className="text-blue-400">Vuln</span>
-          <span className="text-purple-400">Scope</span>
+      <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-6">
+        <Link href="/" className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-dim bg-amber/10 text-amber">
+            <Shield size={18} />
+          </div>
+          <div>
+            <p className="font-display text-2xl tracking-widest text-primary">VulnScope</p>
+            <p className="font-mono text-[0.6rem] uppercase tracking-[0.35em] text-muted">
+              Lab Isolated . Testing Active
+            </p>
+          </div>
         </Link>
 
-        {/* Desktop Nav Links */}
-        <div className="hidden md:flex items-center gap-8">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`text-sm transition ${
-                activeSection === link.href.replace("#", "")
-                  ? "text-blue-400"
-                  : "text-slate-400 hover:text-blue-300"
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
+        <div className="hidden items-center gap-7 md:flex">
+          {renderNavItems(activeSection, () => setMobileOpen(false))}
         </div>
 
-        {/* CTA Buttons */}
-        <div className="hidden sm:flex items-center gap-3">
-          <a
-            href="#docs"
-            className="text-sm text-slate-400 hover:text-blue-300 transition"
-          >
-            Docs
-          </a>
+        <div className="hidden items-center gap-3 sm:flex">
           <Link
-            href="/dashboard"
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:from-blue-500 hover:to-purple-500 transition"
+            href="/auth/register"
+            className="rounded-full bg-amber px-4 py-2 text-sm font-semibold text-bg-primary transition hover:bg-amber-glow"
           >
-            <Download size={16} />
-            Extension
+            Launch Console
           </Link>
         </div>
 
-        {/* Mobile Menu Button */}
         <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden text-blue-400"
-          aria-label="Toggle mobile menu"
+          type="button"
+          aria-label="Toggle navigation"
+          className="rounded-lg border border-amber-dim/70 p-2 text-amber md:hidden"
+          onClick={() => setMobileOpen((value) => !value)}
         >
-          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+          {mobileOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-slate-950 border-b border-slate-700 px-6 py-4 space-y-4">
-          {NAV_LINKS.map((link) => (
+        <div className="border-t border-amber-dim/50 bg-bg-secondary px-6 py-5 md:hidden">
+          <div className="flex flex-col gap-4">
+            {renderNavItems(activeSection, () => setMobileOpen(false))}
             <Link
-              key={link.href}
-              href={link.href}
-              className="block text-sm text-slate-400 hover:text-blue-300 transition"
+              href="/auth/register"
+              onClick={() => setMobileOpen(false)}
+              className="rounded-xl bg-amber px-4 py-3 text-center text-sm font-semibold text-bg-primary"
             >
-              {link.label}
+              Launch Console
             </Link>
-          ))}
-          <Link
-            href="/dashboard"
-            className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:from-blue-500 hover:to-purple-500 transition"
-          >
-            <Download size={16} />
-            Get Extension
-          </Link>
+          </div>
         </div>
       )}
     </nav>

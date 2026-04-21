@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/set-state-in-effect */
+"use client";
 
 import { useState, useEffect } from "react";
 import { Target, TargetType, EnvironmentLabel, TargetStatus } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { X } from "lucide-react";
 
 interface EditTargetModalProps {
@@ -61,275 +61,130 @@ export default function EditTargetModal({
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = "Target name is required";
-    }
-
-    if (!formData.url.trim()) {
-      newErrors.url = "URL is required";
-    }
-
-    if (formData.type === "ip" && formData.ipAddress && !/^(\d{1,3}\.){3}\d{1,3}$/.test(formData.ipAddress)) {
-      newErrors.ipAddress = "Invalid IP address";
-    }
-
-    if (formData.port && isNaN(Number(formData.port))) {
-      newErrors.port = "Port must be a number";
-    }
-
+    if (!formData.name.trim()) newErrors.name = "Target name is required";
+    if (!formData.url.trim()) newErrors.url = "URL is required";
+    if (formData.type === "ip" && formData.ipAddress && !/^(\d{1,3}\.){3}\d{1,3}$/.test(formData.ipAddress)) newErrors.ipAddress = "Invalid IP address";
+    if (formData.port && isNaN(Number(formData.port))) newErrors.port = "Port must be a number";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
-    }
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm() || !target) {
-      return;
-    }
-
-    const tagsArray = formData.tags
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter((tag) => tag);
-
-    onEdit(target.id, {
+    if (!validateForm() || !target) return;
+    const tagsArray = formData.tags.split(",").map(tag => tag.trim()).filter(tag => tag);
+    const updates: Partial<Target> = {
       name: formData.name,
       type: formData.type,
       url: formData.url,
-      ipAddress: formData.ipAddress || undefined,
-      port: formData.port ? Number(formData.port) : undefined,
-      tags: tagsArray,
       environment: formData.environment,
       status: formData.status as "active" | "inactive" | "unreachable",
-      riskLevel: formData.riskLevel as "critical" | "high" | "medium" | "low",
-      credentials: formData.username
-        ? {
-            username: formData.username,
-            password: formData.password,
-            authType: "basic",
-          }
-        : undefined,
-    });
+      riskLevel: formData.riskLevel,
+      tags: tagsArray,
+    };
+    if (formData.type === "ip") {
+      updates.ipAddress = formData.ipAddress || undefined;
+      updates.port = formData.port ? Number(formData.port) : undefined;
+    }
+    if (formData.username) {
+      updates.credentials = { username: formData.username, password: formData.password, authType: "basic" };
+    }
+    onEdit(target.id, updates);
+    onClose();
   };
 
   if (!isOpen || !target) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-slate-700 flex items-center justify-between sticky top-0 bg-slate-950 z-10">
+    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+      <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl border border-slate-800 bg-slate-900 shadow-2xl">
+        <div className="p-6 border-b border-slate-800 flex items-center justify-between sticky top-0 bg-slate-900 z-10">
           <h2 className="text-lg font-bold text-white">Edit Target</h2>
-          <button
-            onClick={onClose}
-            className="text-dimtext hover:text-white transition-colors"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <button onClick={onClose} className="text-dimtext hover:text-white transition-colors"><X className="h-5 w-5" /></button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Target Name */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-white">Target Name *</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full px-3 py-2 bg-surface border border-slate-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isLoading}
-            />
+            <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber" disabled={isLoading} />
             {errors.name && <p className="text-xs text-red-400">{errors.name}</p>}
           </div>
 
-          {/* Target Type */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-white">Target Type *</label>
-            <select
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
-              className="w-full px-3 py-2 bg-surface border border-slate-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isLoading}
-            >
-              {targetTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </option>
-              ))}
+            <select name="type" value={formData.type} onChange={handleChange} className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber" disabled={isLoading}>
+              {targetTypes.map(type => <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>)}
             </select>
           </div>
 
-          {/* URL */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-white">URL/Hostname *</label>
-            <input
-              type="text"
-              name="url"
-              value={formData.url}
-              onChange={handleChange}
-              className="w-full px-3 py-2 bg-surface border border-slate-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isLoading}
-            />
+            <input type="text" name="url" value={formData.url} onChange={handleChange} className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber" disabled={isLoading} />
             {errors.url && <p className="text-xs text-red-400">{errors.url}</p>}
           </div>
 
-          {/* IP Address */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-white">IP Address</label>
-            <input
-              type="text"
-              name="ipAddress"
-              value={formData.ipAddress}
-              onChange={handleChange}
-              className="w-full px-3 py-2 bg-surface border border-slate-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isLoading}
-            />
-            {errors.ipAddress && <p className="text-xs text-red-400">{errors.ipAddress}</p>}
-          </div>
+          {/* Only show IP/Port fields when type is "ip" */}
+          {formData.type === "ip" && (
+            <>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-white">IP Address</label>
+                <input type="text" name="ipAddress" value={formData.ipAddress} onChange={handleChange} className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber" disabled={isLoading} />
+                {errors.ipAddress && <p className="text-xs text-red-400">{errors.ipAddress}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-white">Port</label>
+                <input type="text" name="port" value={formData.port} onChange={handleChange} className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber" disabled={isLoading} />
+                {errors.port && <p className="text-xs text-red-400">{errors.port}</p>}
+              </div>
+            </>
+          )}
 
-          {/* Port */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-white">Port</label>
-            <input
-              type="text"
-              name="port"
-              value={formData.port}
-              onChange={handleChange}
-              className="w-full px-3 py-2 bg-surface border border-slate-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isLoading}
-            />
-            {errors.port && <p className="text-xs text-red-400">{errors.port}</p>}
-          </div>
-
-          {/* Environment */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-white">Environment *</label>
-            <select
-              name="environment"
-              value={formData.environment}
-              onChange={handleChange}
-              className="w-full px-3 py-2 bg-surface border border-slate-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isLoading}
-            >
-              {environments.map((env) => (
-                <option key={env} value={env}>
-                  {env.charAt(0).toUpperCase() + env.slice(1)}
-                </option>
-              ))}
+            <select name="environment" value={formData.environment} onChange={handleChange} className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber" disabled={isLoading}>
+              {environments.map(env => <option key={env} value={env}>{env.charAt(0).toUpperCase() + env.slice(1)}</option>)}
             </select>
           </div>
 
-          {/* Status */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-white">Status *</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full px-3 py-2 bg-surface border border-slate-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isLoading}
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="unreachable">Unreachable</option>
+            <select name="status" value={formData.status} onChange={handleChange} className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber" disabled={isLoading}>
+              <option value="active">Active</option><option value="inactive">Inactive</option><option value="unreachable">Unreachable</option>
             </select>
           </div>
 
-          {/* Risk Level */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-white">Risk Level *</label>
-            <select
-              name="riskLevel"
-              value={formData.riskLevel}
-              onChange={handleChange}
-              className="w-full px-3 py-2 bg-surface border border-slate-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isLoading}
-            >
-              {riskLevels.map((level) => (
-                <option key={level} value={level}>
-                  {level.charAt(0).toUpperCase() + level.slice(1)}
-                </option>
-              ))}
+            <select name="riskLevel" value={formData.riskLevel} onChange={handleChange} className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber" disabled={isLoading}>
+              {riskLevels.map(level => <option key={level} value={level}>{level.charAt(0).toUpperCase() + level.slice(1)}</option>)}
             </select>
           </div>
 
-          {/* Tags */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-white">Tags (comma-separated)</label>
-            <input
-              type="text"
-              name="tags"
-              value={formData.tags}
-              onChange={handleChange}
-              className="w-full px-3 py-2 bg-surface border border-slate-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isLoading}
-            />
+            <input type="text" name="tags" value={formData.tags} onChange={handleChange} className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber" disabled={isLoading} />
           </div>
 
-          {/* Credentials Section */}
-          <div className="pt-2 border-t border-slate-700">
+          <div className="pt-2 border-t border-slate-800">
             <p className="text-xs font-medium text-dimtext mb-3">Authentication (Optional)</p>
-
             <div className="space-y-3">
-              <input
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Username"
-                className="w-full px-3 py-2 bg-surface border border-slate-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={isLoading}
-              />
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Password"
-                className="w-full px-3 py-2 bg-surface border border-slate-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={isLoading}
-              />
+              <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Username" className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber" disabled={isLoading} />
+              <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber" disabled={isLoading} />
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              className="flex-1"
-              onClick={onClose}
-              disabled={isLoading}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              className="flex-1 bg-blue-600 hover:bg-blue-700"
-              disabled={isLoading}
-            >
-              {isLoading ? "Saving..." : "Save Changes"}
-            </Button>
+            <Button type="button" variant="outline" className="flex-1" onClick={onClose} disabled={isLoading}>Cancel</Button>
+            <Button type="submit" className="flex-1 bg-amber hover:bg-amber-glow text-bg-primary" disabled={isLoading}>{isLoading ? "Saving..." : "Save Changes"}</Button>
           </div>
         </form>
-      </Card>
+      </div>
     </div>
   );
 }

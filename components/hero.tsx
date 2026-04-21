@@ -81,10 +81,7 @@ export default function Hero() {
           variants={item}
           className="border border-border-accent bg-surface rounded-full px-4 py-1.5 flex items-center gap-2"
         >
-          <div className="w-1.5 h-1.5 rounded-full bg-amber animate-pulse-dot" />
-          <span className="font-mono text-xs text-muted tracking-widest">
-            Final Year Engineering Project · Cybersecurity · 2024–25
-          </span>
+        
         </motion.div>
 
         {/* Title */}
@@ -123,12 +120,6 @@ export default function Hero() {
             className="bg-amber text-bg-primary font-mono font-semibold text-sm px-7 py-3 rounded hover:bg-amber-glow hover:-translate-y-0.5 transition-all shadow-[0_0_24px_rgba(232,124,30,0)] hover:shadow-[0_0_24px_rgba(232,124,30,0.3)]"
           >
             Explore Pipeline →
-          </Link>
-          <Link
-            href="#tools"
-            className="border border-border-accent text-muted font-mono text-sm px-7 py-3 rounded hover:text-primary hover:border-muted transition"
-          >
-            View Tools
           </Link>
         </motion.div>
 

@@ -16,7 +16,7 @@ export interface User {
   role: UserRole;
   avatar?: string;
   createdAt: Date;
-  updateAt: Date;
+  updatedAt: Date;
 }
 
 export interface AuthContext {
@@ -25,7 +25,7 @@ export interface AuthContext {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 // ============================================================================
@@ -178,6 +178,9 @@ export interface AIRemediationSuggestion {
   accepted: boolean;
   acceptedAt?: Date;
   acceptedBy?: string;
+  rejectedAt?: Date;
+  rejectedBy?: string;
+  rejectionReason?: string;
 }
 
 // ============================================================================
@@ -227,6 +230,34 @@ export interface DashboardStats {
   aiFixesAccepted: number;
   mttrAverage: number; // minutes
   fixAcceptanceRate: number; // 0-1
+}
+
+// ============================================================================
+// DASHBOARD SETTINGS
+// ============================================================================
+
+export interface UserSettings {
+  notifications: boolean;
+  autoScan: boolean;
+  emailReports: boolean;
+  darkMode: boolean;
+  twoFactor: boolean;
+  dataRetention: number;
+}
+
+// ============================================================================
+// SCAN PIPELINE
+// ============================================================================
+
+export type PipelineStageStatus = "pending" | "running" | "completed" | "failed" | "cancelled";
+
+export interface ScanPipelineStage {
+  id: string;
+  name: string;
+  description: string;
+  status: PipelineStageStatus;
+  logs: string[];
+  duration?: number;
 }
 
 // ============================================================================

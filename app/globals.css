@@ -1,8 +1,8 @@
 @import "tailwindcss";
 :root {
-  --font-display: "";
-  --font-mono: "";
-  --font-body: "";
+  --font-display: "Arial Narrow", "Impact", sans-serif;
+  --font-mono: "Consolas", "Courier New", monospace;
+  --font-body: "Segoe UI", "Helvetica Neue", sans-serif;
 }
 
 html {
@@ -97,7 +97,7 @@ body {
 
 @layer base {
   html {
-    font-family: system-ui, sans-serif;
+    font-family: var(--font-body), system-ui, sans-serif;
   }
   body {
     background-color: #080A0C;

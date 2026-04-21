@@ -1,71 +1,81 @@
-/**
- * Zustand Auth Store
- * Manages user authentication state globally
- */
+"use client";
 
 import { create } from "zustand";
-import { User, AuthContext } from "@/lib/types";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { authApi } from "@/lib/api";
+import { AuthContext, User } from "@/lib/types";
 
 interface AuthStore extends AuthContext {
-  setUser: (user: User | null) => void;
-  setLoading: (loading: boolean) => void;
+  hydrated: boolean;
+  setHydrated: (value: boolean) => void;
+  hydrateSession: () => Promise<void>;
 }
 
-export const useAuth = create<AuthStore>((set) => ({
-  user: null,
-  isAuthenticated: false,
-  isLoading: false,
+export const useAuth = create<AuthStore>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      hydrated: false,
 
-  setUser: (user: User | null) => {
-    set({
-      user,
-      isAuthenticated: !!user,
-    });
-  },
+      setHydrated: (value) => set({ hydrated: value }),
 
-  setLoading: (loading: boolean) => {
-    set({ isLoading: loading });
-  },
+      hydrateSession: async () => {
+        if (get().hydrated) {
+          return;
+        }
+        const sessionUser = await authApi.getSession();
+        set({
+          user: sessionUser,
+          isAuthenticated: Boolean(sessionUser),
+          hydrated: true,
+        });
+      },
 
-  login: async (email: string, password: string) => {
-    set({ isLoading: true });
-    try {
-      // TODO: Call your auth API
-      // const response = await fetch("/api/auth/login", {
-      //   method: "POST",
-      //   body: JSON.stringify({ email, password }),
-      // });
-      // const user = await response.json();
-      // set({ user, isAuthenticated: true });
-      console.log("Login:", email);
-    } catch (error) {
-      console.error("Login failed:", error);
-      throw error;
-    } finally {
-      set({ isLoading: false });
+      login: async (email: string, password: string) => {
+        set({ isLoading: true });
+        try {
+          const user = await authApi.login(email, password);
+          set({ user, isAuthenticated: true });
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      register: async (email: string, password: string, name: string) => {
+        set({ isLoading: true });
+        try {
+          const user = await authApi.register(email, password, name);
+          set({ user, isAuthenticated: true });
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      logout: async () => {
+        set({ isLoading: true });
+        await authApi.logout();
+        set({ user: null, isAuthenticated: false, isLoading: false });
+      },
+    }),
+    {
+      name: "vulnscope-auth",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) =>
+        ({
+          user: state.user,
+          isAuthenticated: state.isAuthenticated,
+        }) satisfies Partial<AuthStore>,
+      onRehydrateStorage: () => (state) => {
+        state?.setHydrated(true);
+      },
+      merge: (persisted, current) => ({
+        ...current,
+        ...(persisted as Partial<AuthStore>),
+      }),
     }
-  },
+  )
+);
 
-  register: async (email: string, password: string, name: string) => {
-    set({ isLoading: true });
-    try {
-      // TODO: Call your auth API
-      // const response = await fetch("/api/auth/register", {
-      //   method: "POST",
-      //   body: JSON.stringify({ email, password, name }),
-      // });
-      // const user = await response.json();
-      // set({ user, isAuthenticated: true });
-      console.log("Register:", email, name);
-    } catch (error) {
-      console.error("Register failed:", error);
-      throw error;
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
-  logout: () => {
-    set({ user: null, isAuthenticated: false });
-  },
-}));
+export const getCurrentUser = (): User | null => useAuth.getState().user;

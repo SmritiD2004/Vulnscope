@@ -1,114 +1,120 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Eye, PauseCircle, Plus, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Plus, Play, Pause, Trash2, Eye } from "lucide-react";
+import { NewScanModal } from "@/components/vulnscope/scans/new-scan-modal";
+import { useDashboard } from "@/lib/store/useDashboard";
 
 export default function ScansPage() {
-  const [scans] = useState([
-    {
-      id: "1",
-      name: "Production Web App Scan",
-      target: "https://example.com",
-      status: "completed",
-      startedAt: "2024-01-15T10:30:00Z",
-      duration: "45m",
-      findings: 12,
-    },
-    {
-      id: "2",
-      name: "Internal Network Scan",
-      target: "192.168.1.0/24",
-      status: "running",
-      startedAt: "2024-01-15T14:20:00Z",
-      duration: "15m",
-      findings: 3,
-    },
-  ]);
-
-  const statusColors = {
-    completed: "bg-green-500/20 text-green-400 border-green-500/30",
-    running: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-    failed: "bg-red-500/20 text-red-400 border-red-500/30",
-    queued: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { scans, targets, cancelScan } = useDashboard();
+  const [scanModalOpen, setScanModalOpen] = useState(false);
+  const isModalOpen = scanModalOpen || searchParams.get("new") === "1";
+  const handleCloseModal = () => {
+    setScanModalOpen(false);
+    if (searchParams.get("new") === "1") {
+      router.replace("/dashboard/scans");
+    }
   };
+
+  const scanRows = useMemo(
+    () =>
+      scans.map((scan) => ({
+        ...scan,
+        target: targets.find((target) => target.id === scan.targetId),
+      })),
+    [scans, targets]
+  );
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Scans</h1>
-          <p className="text-dimtext mt-1">Manage and monitor security scans</p>
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-amber">Execution Queue</p>
+          <h1 className="mt-2 font-display text-6xl tracking-wider text-primary">Scans</h1>
+          <p className="mt-3 max-w-2xl text-sm text-muted">
+            Launch new assessments, monitor live jobs, and jump directly into progress or report views.
+          </p>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2">
-          <Plus className="h-4 w-4" />
+
+        <button
+          type="button"
+          onClick={() => setScanModalOpen(true)}
+          className="inline-flex items-center gap-2 rounded-full bg-amber px-4 py-2 text-sm font-semibold text-bg-primary"
+        >
+          <Plus size={16} />
           New Scan
-        </Button>
+        </button>
       </div>
 
-      {/* Scans List */}
-      <Card>
-        <div className="p-6 border-b border-slate-700">
-          <h2 className="text-lg font-semibold text-white">Recent Scans</h2>
+      <Card className="border border-slate-800 bg-bg-secondary px-0 py-0">
+        <div className="border-b border-slate-800 px-6 py-5">
+          <h2 className="text-xl font-semibold text-primary">Recent Scans</h2>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-700 bg-slate-900/50">
-                <th className="px-6 py-4 text-left font-semibold text-white">Scan Name</th>
-                <th className="px-6 py-4 text-left font-semibold text-white">Target</th>
-                <th className="px-6 py-4 text-left font-semibold text-white">Status</th>
-                <th className="px-6 py-4 text-left font-semibold text-white">Started</th>
-                <th className="px-6 py-4 text-left font-semibold text-white">Duration</th>
-                <th className="px-6 py-4 text-left font-semibold text-white">Findings</th>
-                <th className="px-6 py-4 text-right font-semibold text-white">Actions</th>
+              <tr className="border-b border-slate-800 text-left text-sm text-muted">
+                <th className="px-6 py-4">Target</th>
+                <th className="px-6 py-4">Mode</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4">Started</th>
+                <th className="px-6 py-4">Progress</th>
+                <th className="px-6 py-4">Findings</th>
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {scans.map((scan) => (
-                <tr key={scan.id} className="border-b border-slate-700 hover:bg-slate-900/50 transition-colors">
+              {scanRows.map((scan) => (
+                <tr key={scan.id} className="border-b border-slate-900">
                   <td className="px-6 py-4">
-                    <p className="font-medium text-white">{scan.name}</p>
+                    <p className="font-medium text-primary">{scan.target?.name ?? "Unknown Target"}</p>
+                    <p className="mt-1 text-sm text-muted">{scan.target?.url ?? scan.targetId}</p>
                   </td>
+                  <td className="px-6 py-4 text-sm text-muted">{scan.toolsRunning.join(", ")}</td>
                   <td className="px-6 py-4">
-                    <p className="text-sm text-dimtext font-mono">{scan.target}</p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`text-xs px-2.5 py-1 rounded border inline-block capitalize ${statusColors[scan.status as keyof typeof statusColors]}`}>
+                    <span className="rounded-full border border-amber-dim bg-amber/10 px-3 py-1 text-xs uppercase tracking-[0.2em] text-amber">
                       {scan.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <p className="text-sm text-dimtext">
-                      {new Date(scan.startedAt).toLocaleDateString()}
-                    </p>
+                  <td className="px-6 py-4 text-sm text-muted">
+                    {new Date(scan.startTime).toLocaleString()}
                   </td>
                   <td className="px-6 py-4">
-                    <p className="text-sm text-dimtext">{scan.duration}</p>
+                    <div className="w-40 overflow-hidden rounded-full bg-slate-800">
+                      <div className="h-2 bg-amber" style={{ width: `${scan.progress}%` }} />
+                    </div>
+                    <p className="mt-1 text-xs text-muted">{scan.progress}% complete</p>
                   </td>
+                  <td className="px-6 py-4 text-sm text-primary">{scan.findingsCount}</td>
                   <td className="px-6 py-4">
-                    <p className="text-sm text-white">{scan.findings}</p>
-                  </td>
-                  <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
+                      <Link
+                        href={`/dashboard/scans/${scan.id}/progress`}
+                        className="rounded-full border border-slate-700 p-2 text-muted hover:text-primary"
+                      >
+                        <Eye size={16} />
+                      </Link>
                       {scan.status === "running" && (
-                        <button className="p-2 hover:bg-slate-700 rounded transition-colors text-blue-400 hover:text-blue-300">
-                          <Pause className="h-4 w-4" />
+                        <button
+                          type="button"
+                          onClick={() => void cancelScan(scan.id)}
+                          className="rounded-full border border-slate-700 p-2 text-muted hover:text-primary"
+                        >
+                          <PauseCircle size={16} />
                         </button>
                       )}
-                      {scan.status === "queued" && (
-                        <button className="p-2 hover:bg-slate-700 rounded transition-colors text-green-400 hover:text-green-300">
-                          <Play className="h-4 w-4" />
-                        </button>
-                      )}
-                      <button className="p-2 hover:bg-slate-700 rounded transition-colors text-amber-400 hover:text-amber-300">
-                        <Eye className="h-4 w-4" />
-                      </button>
-                      <button className="p-2 hover:bg-slate-700 rounded transition-colors text-red-400 hover:text-red-300">
-                        <Trash2 className="h-4 w-4" />
+                      <button
+                        type="button"
+                        className="rounded-full border border-slate-700 p-2 text-muted hover:text-primary"
+                        disabled
+                      >
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </td>
@@ -118,6 +124,8 @@ export default function ScansPage() {
           </table>
         </div>
       </Card>
+
+      <NewScanModal isOpen={isModalOpen} onClose={handleCloseModal} />
     </div>
   );
 }

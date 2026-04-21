@@ -1,183 +1,120 @@
 "use client";
-/* eslint-disable */
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useAuth } from "@/lib/store/useAuth";
-import { Button } from "@/components/ui/button";
+import { useRouter, useSearchParams } from "next/navigation";
+import { AlertCircle, CheckCircle2, Lock, Mail } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Mail, Lock, AlertCircle, CheckCircle } from "lucide-react";
-
-interface FormErrors {
-  email?: string;
-  password?: string;
-  general?: string;
-}
+import { useAuth } from "@/lib/store/useAuth";
 
 export default function LoginForm() {
   const router = useRouter();
-  const { login, isLoading } = useAuth();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-  const [errors, setErrors] = useState<FormErrors>({});
+  const searchParams = useSearchParams();
+  const { login, isLoading, isAuthenticated, hydrated, hydrateSession } = useAuth();
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
   const [success, setSuccess] = useState(false);
 
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
+  useEffect(() => {
+    hydrateSession();
+  }, [hydrateSession]);
 
-    // Email validation
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
+  useEffect(() => {
+    if (hydrated && isAuthenticated) {
+      router.replace(searchParams.get("returnTo") ?? "/dashboard");
     }
+  }, [hydrated, isAuthenticated, router, searchParams]);
 
-    // Password validation
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
+  const validate = () => {
+    const newErrors: typeof errors = {};
+    if (!formData.email) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Invalid email";
+    if (!formData.password) newErrors.password = "Password required";
+    else if (formData.password.length < 6) newErrors.password = "Minimum 6 characters";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    // Clear error for this field when user starts typing
-    if (errors[name as keyof FormErrors]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: undefined,
-      }));
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
+    setSuccess(false);
+    if (!validate()) return;
     try {
-      setSuccess(true);
       await login(formData.email, formData.password);
-      // Redirect to dashboard after successful login
+      setSuccess(true);
       setTimeout(() => {
-        router.push("/dashboard");
+        router.replace(searchParams.get("returnTo") ?? "/dashboard");
       }, 500);
-    } catch (error) {
-      setSuccess(false);
-      setErrors({
-        general: error instanceof Error ? error.message : "Login failed. Please try again.",
-      });
+    } catch (err) {
+      setErrors({ general: err instanceof Error ? err.message : "Login failed" });
     }
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <div className="p-8 space-y-6">
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-white">Login</h1>
-          <p className="text-sm text-dimtext">Access your VulnScope dashboard</p>
+    <Card className="w-full max-w-md border border-amber-dim/60 bg-surface/95 px-8 py-8 shadow-xl">
+      <div className="space-y-6">
+        <div>
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-amber">Operator Login</p>
+          <h1 className="font-display text-5xl tracking-wider text-primary">Access Dashboard</h1>
+          <p className="text-sm text-muted">Use your lab account to continue.</p>
         </div>
 
-        {/* General Error */}
         {errors.general && (
-          <div className="flex gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded text-sm text-red-400">
-            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-            <span>{errors.general}</span>
+          <div className="flex gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            <AlertCircle size={16} /> {errors.general}
           </div>
         )}
-
-        {/* Success Message */}
         {success && (
-          <div className="flex gap-2 p-3 bg-green-500/10 border border-green-500/20 rounded text-sm text-green-400">
-            <CheckCircle className="h-4 w-4 shrink-0 mt-0.5" />
-            <span>Login successful! Redirecting...</span>
+          <div className="flex gap-2 rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-300">
+            <CheckCircle2 size={16} /> Login successful. Redirecting...
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email Field */}
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium text-white">
-              Email Address
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-dimtext" />
+          <div>
+            <label className="text-sm font-medium text-primary">Email</label>
+            <div className="relative mt-1">
+              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-dimtext" />
               <input
-                id="email"
                 type="email"
-                name="email"
                 value={formData.email}
-                onChange={handleChange}
-                placeholder="you@example.com"
-                className={`w-full pl-10 pr-4 py-2 bg-surface border rounded text-white placeholder:text-dimtext focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all ${
-                  errors.email
-                    ? "border-red-500/50 focus:ring-red-500/50"
-                    : "border-slate-600 focus:ring-blue-500/50"
-                }`}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full rounded-xl border border-slate-700 bg-bg-primary py-2.5 pl-10 pr-4 text-white focus:border-amber focus:ring-1 focus:ring-amber"
                 disabled={isLoading}
               />
             </div>
-            {errors.email && <p className="text-xs text-red-400">{errors.email}</p>}
+            {errors.email && <p className="mt-1 text-xs text-red-300">{errors.email}</p>}
           </div>
 
-          {/* Password Field */}
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium text-white">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-dimtext" />
+          <div>
+            <label className="text-sm font-medium text-primary">Password</label>
+            <div className="relative mt-1">
+              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-dimtext" />
               <input
-                id="password"
                 type="password"
-                name="password"
                 value={formData.password}
-                onChange={handleChange}
-                placeholder="••••••••"
-                className={`w-full pl-10 pr-4 py-2 bg-surface border rounded text-white placeholder:text-dimtext focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all ${
-                  errors.password
-                    ? "border-red-500/50 focus:ring-red-500/50"
-                    : "border-slate-600 focus:ring-blue-500/50"
-                }`}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="w-full rounded-xl border border-slate-700 bg-bg-primary py-2.5 pl-10 pr-4 text-white focus:border-amber focus:ring-1 focus:ring-amber"
                 disabled={isLoading}
               />
             </div>
-            {errors.password && <p className="text-xs text-red-400">{errors.password}</p>}
+            {errors.password && <p className="mt-1 text-xs text-red-300">{errors.password}</p>}
           </div>
 
-          {/* Submit Button */}
-          <Button
+          <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded transition-colors"
             disabled={isLoading}
+            className="w-full rounded-xl bg-amber py-2.5 font-semibold text-bg-primary transition hover:bg-amber-glow disabled:opacity-70"
           >
             {isLoading ? "Logging in..." : "Login"}
-          </Button>
+          </button>
         </form>
 
-        {/* Footer */}
-        <div className="pt-4 border-t border-slate-700 space-y-3">
-          <p className="text-sm text-dimtext text-center">
-            Don't have an account?{" "}
-            <Link href="/auth/register" className="text-blue-400 hover:text-blue-300 font-medium">
-              Register here
-            </Link>
-          </p>
+        <div className="border-t border-slate-800 pt-4 text-center text-sm text-muted">
+          Need an account?{" "}
+          <Link href="/auth/register" className="font-medium text-amber hover:text-amber-glow">
+            Create one
+          </Link>
         </div>
       </div>
     </Card>

@@ -84,9 +84,9 @@ export default function FixSnippetShowcase() {
             <button
               key={idx}
               onClick={() => setActiveTab(idx)}
-              className={`px-4 py-2 rounded-lg whitespace-nowrap font-medium transition-all ${
+                className={`px-4 py-2 rounded-lg whitespace-nowrap font-medium transition-all ${
                 activeTab === idx
-                  ? "bg-blue-600 text-white"
+                  ? "bg-amber text-bg-primary"
                   : "bg-slate-800 text-dimtext hover:bg-slate-700"
               }`}
             >

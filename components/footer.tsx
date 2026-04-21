@@ -1,126 +1,69 @@
-"use client";
-
 import Link from "next/link";
+import { ShieldCheck } from "lucide-react";
 import { GITHUB_URL } from "@/lib/constants";
-import { Code } from "lucide-react";
+
+const footerLinks = [
+  { label: "About", href: "#about" },
+  { label: "Pipeline", href: "#pipeline" },
+  { label: "Research", href: "#research" },
+];
 
 export default function Footer() {
   return (
-    <footer className="border-t border-slate-700" style={{ backgroundImage: "linear-gradient(to bottom, rgb(15,23,42) 0%, rgb(3,7,18) 100%)" }}>
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-          {/* Brand */}
-          <div className="flex flex-col gap-4">
-            <Link href="/" className="font-bold text-lg tracking-tight">
-              <span className="text-blue-400">Vuln</span>
-              <span className="text-purple-400">Scope</span>
-            </Link>
-            <p className="text-slate-400 text-sm leading-relaxed">
-              Automated vulnerability scanning with AI-powered fixes. Scan, analyze, and remediate in seconds.
+    <footer className="border-t border-amber-dim/60 bg-bg-secondary">
+      <div className="mx-auto max-w-7xl px-6 py-14">
+        {/* Flex container for alignment */}
+        <div className="flex flex-col md:flex-row justify-between gap-10">
+          {/* Left section: Brand + description */}
+          <div className="space-y-4 md:max-w-md">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-amber-dim bg-amber/10 text-amber">
+                <ShieldCheck size={18} />
+              </div>
+              <div>
+                <p className="font-display text-3xl tracking-widest text-primary">VulnScope</p>
+                <p className="font-mono text-[0.7rem] uppercase tracking-[0.28em] text-muted">
+                  Automated VAPT Research Pipeline
+                </p>
+              </div>
+            </div>
+            <p className="text-sm leading-relaxed text-muted">
+              Focused on safe, lab-contained penetration testing
+              automation across DVWA, Metasploitable, and reproducible research targets.
             </p>
-            <a
-              href={GITHUB_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-slate-400 hover:text-blue-400 transition w-fit"
-            >
-              <Code size={18} />
-              GitHub
-            </a>
+            <div className="flex flex-wrap gap-3">
+              <div className="rounded-full border border-amber-dim bg-amber/10 px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.2em] text-amber">
+                Lab Isolated . Testing Active
+              </div>
+              <div className="rounded-full border border-slate-700 px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.2em] text-muted">
+                2025-2026 Capstone
+              </div>
+            </div>
           </div>
 
-          {/* Product */}
-          <div>
-            <h4 className="font-semibold text-white mb-4">Product</h4>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/dashboard" className="text-slate-400 hover:text-blue-400 transition text-sm">
-                  Dashboard
+          {/* Right section: Navigation links */}
+          <div className="md:text-right">
+            <p className="font-mono text-xs uppercase tracking-[0.25em] text-amber">Navigate</p>
+            <div className="mt-4 flex flex-col gap-3">
+              {footerLinks.map((item) => (
+                <Link key={item.href} href={item.href} className="text-sm text-muted hover:text-primary">
+                  {item.label}
                 </Link>
-              </li>
-              <li>
-                <a href="#features" className="text-slate-400 hover:text-blue-400 transition text-sm">
-                  Features
-                </a>
-              </li>
-              <li>
-                <Link href="/docs" className="text-slate-400 hover:text-blue-400 transition text-sm">
-                  Documentation
-                </Link>
-              </li>
-              <li>
-                <a href="#pricing" className="text-slate-400 hover:text-blue-400 transition text-sm">
-                  Pricing
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h4 className="font-semibold text-white mb-4">Resources</h4>
-            <ul className="space-y-3">
-              <li>
-                <a href="#blog" className="text-slate-400 hover:text-blue-400 transition text-sm">
-                  Blog
-                </a>
-              </li>
-              <li>
-                <a href="#security" className="text-slate-400 hover:text-blue-400 transition text-sm">
-                  Security
-                </a>
-              </li>
-              <li>
-                <a href="#api" className="text-slate-400 hover:text-blue-400 transition text-sm">
-                  API Reference
-                </a>
-              </li>
-              <li>
-                <a href="#status" className="text-slate-400 hover:text-blue-400 transition text-sm">
-                  Status Page
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div>
-            <h4 className="font-semibold text-white mb-4">Legal</h4>
-            <ul className="space-y-3">
-              <li>
-                <a href="#privacy" className="text-slate-400 hover:text-blue-400 transition text-sm">
-                  Privacy
-                </a>
-              </li>
-              <li>
-                <a href="#terms" className="text-slate-400 hover:text-blue-400 transition text-sm">
-                  Terms of Service
-                </a>
-              </li>
-              <li>
-                <a href="#cookies" className="text-slate-400 hover:text-blue-400 transition text-sm">
-                  Cookies
-                </a>
-              </li>
-              <li>
-                <a href="#contact" className="text-slate-400 hover:text-blue-400 transition text-sm">
-                  Contact Us
-                </a>
-              </li>
-            </ul>
+              ))}
+              <Link href="/dashboard" className="text-sm text-muted hover:text-primary">
+                Dashboard
+              </Link>
+              <Link href="/auth/login" className="text-sm text-muted hover:text-primary">
+                Login
+              </Link>
+              
+            </div>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="border-t border-slate-700 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-sm">
-            <p>
-              © 2025 VulnScope. Cybersecurity meets automation.
-            </p>
-            <p>
-              Built with Next.js, TypeScript, and cutting-edge security tooling.
-            </p>
-          </div>
+        {/* Bottom copyright */}
+        <div className="mt-10 border-t border-slate-800 pt-5 text-center text-sm text-dimtext">
+          <p>Copyright 2026 VulnScope. Security research for controlled educational environments only.</p>
         </div>
       </div>
     </footer>

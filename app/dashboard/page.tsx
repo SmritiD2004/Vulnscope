@@ -1,198 +1,148 @@
-/**
- * Dashboard Home Page
- * Main control center with stats and overview
- */
-
 "use client";
 
-import React from "react";
-import { Zap, Bug, AlertCircle, FileText, TrendingUp, Check } from "lucide-react";
+import Link from "next/link";
+import { AlertCircle, Check, FileText, Target, TrendingUp, Zap } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useDashboard } from "@/lib/store/useDashboard";
 
-interface StatCardProps {
-  title: string;
-  value: number | string;
-  subtitle?: string;
-  icon: React.ReactNode;
-  trend?: number;
-  color: "amber" | "red" | "blue" | "green";
-}
-
-const StatCard: React.FC<StatCardProps> = ({
+function StatCard({
   title,
   value,
   subtitle,
   icon,
-  trend,
-  color,
-}) => {
-  const colorClasses = {
-    amber: "bg-amber-900/10 border-amber-700 text-amber-400",
-    red: "bg-red-900/10 border-red-700 text-red-400",
-    blue: "bg-blue-900/10 border-blue-700 text-blue-400",
-    green: "bg-green-900/10 border-green-700 text-green-400",
-  };
-
+  accent,
+}: {
+  title: string;
+  value: number | string;
+  subtitle: string;
+  icon: React.ReactNode;
+  accent: string;
+}) {
   return (
-    <Card className={`border ${colorClasses[color]} p-6 space-y-4`}>
+    <Card className={`border px-6 py-6 ${accent}`}>
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-muted">{title}</h3>
-        <div className="p-2 bg-bg-primary rounded">{icon}</div>
+        <p className="text-sm font-medium text-muted">{title}</p>
+        <div>{icon}</div>
       </div>
-
-      <div>
-        <p className="text-3xl font-bold text-primary">{value}</p>
-        {subtitle && (
-          <p className="text-xs text-dimtext mt-1">{subtitle}</p>
-        )}
-      </div>
-
-      {trend !== undefined && (
-        <div className={`flex items-center gap-1 text-xs ${trend > 0 ? "text-red-400" : "text-green-400"}`}>
-          <TrendingUp size={14} />
-          {trend > 0 ? "+" : ""}{trend}% from last week
-        </div>
-      )}
+      <p className="mt-4 font-display text-5xl tracking-wide text-primary">{value}</p>
+      <p className="mt-2 text-sm text-muted">{subtitle}</p>
     </Card>
   );
-};
+}
 
 export default function DashboardPage() {
+  const { scans, stats, reports, targets, vulnerabilities } = useDashboard();
+  const recentScans = scans.slice(0, 3);
+
   return (
     <div className="space-y-8">
-      {/* Page Header */}
       <div>
-        <h1 className="font-display text-4xl tracking-wide text-primary">
-          Dashboard
-        </h1>
-        <p className="text-muted mt-2">
-          Welcome back! Here's your security overview.
+        <p className="font-mono text-xs uppercase tracking-[0.3em] text-amber">Command Center</p>
+        <h1 className="mt-2 font-display text-6xl tracking-wider text-primary">Dashboard</h1>
+        <p className="mt-3 max-w-2xl text-sm text-muted">
+          Unified view of scans, findings, reports, and AI remediation across your active lab targets.
         </p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         <StatCard
           title="Active Scans"
-          value={2}
-          subtitle="Currently running"
-          icon={<Zap size={20} className="text-amber-400" />}
-          color="amber"
+          value={stats.activeScans}
+          subtitle="Pipelines currently executing"
+          icon={<Zap className="text-amber" />}
+          accent="border-amber-dim bg-amber/10"
         />
         <StatCard
           title="Critical Findings"
-          value={7}
-          subtitle="Require immediate action"
-          icon={<AlertCircle size={20} className="text-red-400" />}
-          trend={3}
-          color="red"
-        />
-        <StatCard
-          title="Total Vulnerabilities"
-          value={34}
-          subtitle="Across all targets"
-          icon={<Bug size={20} className="text-blue-400" />}
-          trend={-5}
-          color="blue"
+          value={stats.criticalVulnerabilities}
+          subtitle="Need immediate triage"
+          icon={<AlertCircle className="text-red-300" />}
+          accent="border-red-500/30 bg-red-500/10"
         />
         <StatCard
           title="Reports Generated"
-          value={12}
-          subtitle="This month"
-          icon={<FileText size={20} className="text-blue-400" />}
-          color="blue"
+          value={stats.reportsGenerated}
+          subtitle="Ready for technical review"
+          icon={<FileText className="text-cyan" />}
+          accent="border-slate-800 bg-bg-secondary"
         />
         <StatCard
           title="AI Fixes Accepted"
-          value={18}
-          subtitle="68% acceptance rate"
-          icon={<Check size={20} className="text-green-400" />}
-          color="green"
+          value={stats.aiFixesAccepted}
+          subtitle={`${Math.round(stats.fixAcceptanceRate * 100)}% acceptance rate`}
+          icon={<Check className="text-green-300" />}
+          accent="border-green-500/30 bg-green-500/10"
         />
         <StatCard
-          title="Avg MTTR"
-          value="2.4h"
+          title="Registered Targets"
+          value={targets.length}
+          subtitle="Lab and staging systems in scope"
+          icon={<Target className="text-amber" />}
+          accent="border-slate-800 bg-bg-secondary"
+        />
+        <StatCard
+          title="Average MTTR"
+          value={`${(stats.mttrAverage / 60).toFixed(1)}h`}
           subtitle="Mean time to remediate"
-          icon={<TrendingUp size={20} className="text-green-400" />}
-          color="green"
+          icon={<TrendingUp className="text-primary" />}
+          accent="border-slate-800 bg-bg-secondary"
         />
       </div>
 
-      {/* Recent Activity Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Scans */}
-        <Card className="border border-slate-600 bg-surface p-6 lg:col-span-2">
-          <h2 className="text-lg font-semibold text-primary mb-4">
-            Recent Scans
-          </h2>
-          <div className="space-y-3">
-            {[
-              {
-                name: "DVWA Web App",
-                status: "Completed",
-                findings: 12,
-                time: "2 hours ago",
-              },
-              {
-                name: "Metasploitable",
-                status: "Running",
-                findings: 8,
-                time: "15 mins ago",
-              },
-              {
-                name: "Production API",
-                status: "Completed",
-                findings: 3,
-                time: "1 day ago",
-              },
-            ].map((scan, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between p-3 rounded bg-bg-primary border border-slate-600 hover:border-border-accent transition"
-              >
-                <div>
-                  <p className="font-medium text-primary">{scan.name}</p>
-                  <p className="text-xs text-dimtext">{scan.time}</p>
+      <div className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
+        <Card className="border border-slate-800 bg-bg-secondary px-6 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-primary">Recent Scans</h2>
+              <p className="mt-1 text-sm text-muted">Latest activity across active targets.</p>
+            </div>
+            <Link href="/dashboard/scans" className="text-sm text-amber hover:text-amber-glow">
+              View all
+            </Link>
+          </div>
+
+          <div className="mt-5 space-y-3">
+            {recentScans.map((scan) => {
+              const findings = vulnerabilities.filter((item) => item.scanId === scan.id).length;
+              const target = targets.find((item) => item.id === scan.targetId);
+              return (
+                <div
+                  key={scan.id}
+                  className="flex items-center justify-between rounded-2xl border border-slate-800 bg-bg-primary px-4 py-4"
+                >
+                  <div>
+                    <p className="font-medium text-primary">{target?.name ?? "Unknown Target"}</p>
+                    <p className="mt-1 text-sm text-muted">{target?.url}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm capitalize text-amber">{scan.status}</p>
+                    <p className="mt-1 text-xs text-muted">{findings} findings</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-dimtext">{scan.findings} findings</span>
-                  <span
-                    className={`text-xs font-semibold px-2 py-1 rounded ${
-                      scan.status === "Running"
-                        ? "bg-amber-900/30 text-amber-400"
-                        : "bg-green-900/30 text-green-400"
-                    }`}
-                  >
-                    {scan.status}
-                  </span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Card>
 
-        {/* Quick Actions */}
-        <Card className="border border-slate-600 bg-surface p-6">
-          <h2 className="text-lg font-semibold text-primary mb-4">
-            Quick Actions
-          </h2>
-          <div className="space-y-2">
-            {[
-              { label: "New Scan", icon: "🚀" },
-              { label: "Add Target", icon: "🎯" },
-              { label: "View Reports", icon: "📄" },
-              { label: "AI Remediation", icon: "✨" },
-            ].map((action, i) => (
-              <button
-                key={i}
-                className="w-full flex items-center gap-3 p-3 rounded bg-bg-primary border border-slate-600 hover:border-border-accent hover:shadow-[0_0_12px_rgba(232,124,30,0.15)] transition text-left"
-              >
-                <span>{action.icon}</span>
-                <span className="text-sm font-medium text-primary">
-                  {action.label}
-                </span>
-              </button>
-            ))}
+        <Card className="border border-slate-800 bg-bg-secondary px-6 py-6">
+          <h2 className="text-xl font-semibold text-primary">Quick Actions</h2>
+          <p className="mt-1 text-sm text-muted">Jump to the workflows used most often.</p>
+          <div className="mt-5 space-y-3">
+            <Link href="/dashboard/scans?new=1" className="block rounded-2xl border border-amber-dim bg-amber/10 px-4 py-4 text-primary hover:bg-amber/15">
+              Launch new scan
+            </Link>
+            <Link href="/dashboard/targets" className="block rounded-2xl border border-slate-800 bg-bg-primary px-4 py-4 text-primary hover:border-amber-dim">
+              Manage targets
+            </Link>
+            <Link href="/dashboard/findings" className="block rounded-2xl border border-slate-800 bg-bg-primary px-4 py-4 text-primary hover:border-amber-dim">
+              Review findings
+            </Link>
+            <Link href="/dashboard/reports" className="block rounded-2xl border border-slate-800 bg-bg-primary px-4 py-4 text-primary hover:border-amber-dim">
+              Open reports
+            </Link>
+          </div>
+          <div className="mt-5 rounded-2xl border border-slate-800 bg-bg-primary px-4 py-4 text-sm text-muted">
+            {reports.length} report(s) available and {vulnerabilities.filter((item) => item.aiFix && !item.aiFix.accepted).length} AI remediation suggestion(s) pending review.
           </div>
         </Card>
       </div>

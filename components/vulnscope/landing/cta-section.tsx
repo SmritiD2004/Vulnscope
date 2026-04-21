@@ -1,72 +1,50 @@
 import Link from "next/link";
-import { Download, ArrowRight } from "lucide-react";
+import { ArrowRight, Download } from "lucide-react";
 
 export default function CTASection() {
   return (
-    <section className="py-20 px-4 border-t border-slate-800" style={{ backgroundImage: 'linear-gradient(to bottom, rgb(3,7,18) 0%, rgb(15,23,42) 100%)' }}>
-      <div className="max-w-4xl mx-auto text-center space-y-8">
-        {/* Heading */}
+    <section className="border-t border-slate-800 px-4 py-20" style={{ backgroundImage: "linear-gradient(to bottom, rgb(3,7,18), rgb(15,23,42))" }}>
+      <div className="mx-auto max-w-4xl space-y-8 text-center">
         <div className="space-y-4">
-          <h2 className="text-4xl md:text-5xl font-bold text-white">
-            Ready to Secure Your Application?
-          </h2>
-          <p className="text-lg text-dimtext max-w-2xl mx-auto">
-            Get started in seconds. No credit card required. Free trial available.
+          <h2 className="text-4xl font-bold text-white md:text-5xl">Ready to Secure the Next Target?</h2>
+          <p className="mx-auto max-w-2xl text-lg text-dimtext">
+            Jump from the landing page into the protected dashboard, launch a new scan, and review the full assessment loop.
           </p>
         </div>
 
-        {/* Main CTA */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+        <div className="flex flex-col justify-center gap-4 pt-8 sm:flex-row">
           <Link
-            href="/download-extension"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-blue-500/25"
+            href="/auth/register"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-amber px-8 py-4 font-semibold text-bg-primary transition-colors hover:bg-amber-glow"
           >
             <Download className="h-5 w-5" />
-            Install Extension Now
+            Create Lab Account
           </Link>
           <Link
-            href="/docs"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-lg border border-slate-700 transition-colors"
+            href="/dashboard"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-8 py-4 font-semibold text-white transition-colors hover:bg-slate-700"
           >
-            Read Documentation
+            Open Dashboard
             <ArrowRight className="h-5 w-5" />
           </Link>
         </div>
 
-        {/* Features highlight */}
-        <div className="pt-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid gap-6 pt-8 sm:grid-cols-3">
           {[
-            {
-              title: "2 Minutes Setup",
-              description: "Install and start scanning immediately",
-            },
-            {
-              title: "Free to Use",
-              description: "Basic scans available with our free tier",
-            },
-            {
-              title: "Enterprise Support",
-              description: "Premium features for development teams",
-            },
-          ].map((item, idx) => (
-            <div key={idx} className="p-6 rounded-lg border border-slate-700 bg-slate-900/30">
-              <h3 className="font-semibold text-white mb-2">{item.title}</h3>
+            { title: "2 Minute Setup", description: "Register a mock account and start exploring immediately." },
+            { title: "One Shared Data Layer", description: "Targets, scans, findings, and reports now stay in sync." },
+            { title: "AI Review Loop", description: "Accept or reject remediation proposals directly in the UI." },
+          ].map((item) => (
+            <div key={item.title} className="rounded-lg border border-slate-700 bg-slate-900/30 p-6">
+              <h3 className="mb-2 font-semibold text-white">{item.title}</h3>
               <p className="text-sm text-dimtext">{item.description}</p>
             </div>
           ))}
         </div>
 
-        {/* Footer text */}
-        <div className="pt-8 text-center text-sm text-dimtext border-t border-slate-800">
+        <div className="border-t border-slate-800 pt-8 text-sm text-dimtext">
           <p>
-            By installing VulnScope, you agree to our{" "}
-            <a href="#" className="text-blue-400 hover:text-blue-300">
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a href="#" className="text-blue-400 hover:text-blue-300">
-              Privacy Policy
-            </a>
+            VulnScope is designed for safe, legal, controlled educational environments and demo-ready portfolio review.
           </p>
         </div>
       </div>

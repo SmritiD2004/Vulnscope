@@ -8,9 +8,7 @@ export default function Research() {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.12,
-      },
+      transition: { staggerChildren: 0.12 },
     },
   };
 
@@ -20,28 +18,19 @@ export default function Research() {
   };
 
   return (
-    <section
-      id="research"
-      className="bg-bg-primary py-24 px-6"
-      aria-labelledby="research-heading"
-    >
+    <section id="research" className="bg-bg-primary py-24 px-6" aria-labelledby="research-heading">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <p className="font-mono text-xs text-amber uppercase tracking-widest mb-3">
-          LITERATURE SURVEY
-        </p>
+        <p className="font-mono text-xs text-amber uppercase tracking-widest mb-3">LITERATURE SURVEY</p>
         <h2
           id="research-heading"
           className="font-display text-5xl lg:text-6xl text-primary tracking-widest mb-4"
         >
-          Research-Backed Decisions
+          Research‑Backed Decisions
         </h2>
         <p className="text-muted text-base max-w-lg mb-14">
-          Four research domains informed specific design choices in VulnScope — not just cited
-          for formality.
+          Four research domains directly shaped VulnScope’s design.
         </p>
 
-        {/* Research Grid */}
         <motion.div
           className="grid grid-cols-1 md:grid-cols-2 gap-6"
           variants={container}
@@ -55,24 +44,13 @@ export default function Research() {
               variants={item}
               className="bg-surface border border-slate-600 rounded p-6 flex flex-col gap-4 hover:border-border-accent transition"
             >
-              {/* Domain Number */}
-              <div className="font-display text-5xl text-amber/20 leading-none mb-1">
-                {domain.num}
-              </div>
-
-              {/* Title */}
+              <div className="font-display text-5xl text-amber/20 leading-none mb-1">{domain.num}</div>
               <h3 className="font-mono text-base font-semibold text-primary">{domain.title}</h3>
-
-              {/* Summary */}
               <p className="text-muted text-sm leading-relaxed">{domain.summary}</p>
-
-              {/* Design Impact */}
               <div className="border-l-2 border-amber pl-4 bg-amber/4 py-3 pr-3 rounded-r">
                 <p className="font-mono text-xs text-amber font-semibold mb-1">Design Impact →</p>
                 <p className="text-muted text-sm leading-relaxed">{domain.designImpact}</p>
               </div>
-
-              {/* References */}
               <div className="flex flex-wrap gap-2 mt-2">
                 {domain.refs.map((ref) => (
                   <span

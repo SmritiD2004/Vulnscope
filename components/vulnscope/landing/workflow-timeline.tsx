@@ -1,101 +1,47 @@
- 
-import { Zap, Radar, Search, Brain, FileText, CheckCircle } from "lucide-react";
+import { Brain, CheckCircle, FileText, Radar, Search, Zap } from "lucide-react";
 
 const steps = [
-  {
-    icon: Zap,
-    title: "Paste URL",
-    description: "Share any URL, IP, or domain in the extension",
-    color: "text-blue-400",
-  },
-  {
-    icon: Radar,
-    title: "Tools Run",
-    description: "Nmap, Nikto, SQLMap, and custom checks execute",
-    color: "text-purple-400",
-  },
-  {
-    icon: Search,
-    title: "Findings Detected",
-    description: "All vulnerabilities are discovered and classified",
-    color: "text-orange-400",
-  },
-  {
-    icon: Brain,
-    title: "AI Correlates",
-    description: "AI synthesizes findings and generates context",
-    color: "text-pink-400",
-  },
-  {
-    icon: FileText,
-    title: "Fix Code Generated",
-    description: "Developer-ready code solutions are created",
-    color: "text-cyan-400",
-  },
-  {
-    icon: CheckCircle,
-    title: "PDF Report",
-    description: "Complete report with evidence and fixes",
-    color: "text-green-400",
-  },
+  { icon: Zap, title: "Paste URL", description: "Share any URL, IP, or domain in the console.", color: "text-amber" },
+  { icon: Radar, title: "Tools Run", description: "Nmap, Nikto, SQLMap, and custom checks execute.", color: "text-cyan" },
+  { icon: Search, title: "Findings Detected", description: "Discovered vulnerabilities are classified and ranked.", color: "text-orange-300" },
+  { icon: Brain, title: "AI Correlates", description: "AI groups evidence and drafts remediation guidance.", color: "text-amber-glow" },
+  { icon: FileText, title: "Fix Code Generated", description: "Developer-ready suggestions are attached to findings.", color: "text-primary" },
+  { icon: CheckCircle, title: "PDF Report", description: "A shareable report is ready for review.", color: "text-green-300" },
 ];
 
 export default function WorkflowTimeline() {
   return (
-    <section className="py-20 px-4" style={{ backgroundImage: 'linear-gradient(to bottom, rgb(3,7,18) 0%, rgb(15,23,42) 50%, rgb(3,7,18) 100%)' }}>
-      <div className="max-w-6xl mx-auto">
-        {/* Section header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            The VulnScope Pipeline
-          </h2>
-          <p className="text-lg text-dimtext max-w-2xl mx-auto">
-            From URL to production-ready security fixes in under 5 minutes
+    <section className="px-4 py-20" style={{ backgroundImage: "linear-gradient(to bottom, rgb(3,7,18), rgb(15,23,42), rgb(3,7,18))" }}>
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-16 text-center">
+          <h2 className="text-4xl font-bold text-white md:text-5xl">The VulnScope Pipeline</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-dimtext">
+            From URL to technical report, the dashboard mirrors the same multi-stage research workflow.
           </p>
         </div>
 
-        {/* Timeline */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {steps.map((step, idx) => {
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {steps.map((step, index) => {
             const Icon = step.icon;
             return (
-              <div
-                key={idx}
-                className="group relative p-6 rounded-lg border border-slate-700 bg-slate-900/50 hover:bg-slate-900/80 transition-all cursor-pointer"
-              >
-                {/* Number badge */}
-                <div className="absolute -top-4 -left-4 w-9 h-9 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm">
-                  {idx + 1}
+              <div key={step.title} className="group relative cursor-pointer rounded-lg border border-slate-700 bg-slate-900/50 p-6 transition-all hover:bg-slate-900/80">
+                <div className="absolute -left-4 -top-4 flex h-9 w-9 items-center justify-center rounded-full bg-amber text-sm font-bold text-bg-primary">
+                  {index + 1}
                 </div>
-
-                {/* Icon */}
-                <div className={`mb-4 inline-block p-3 rounded-lg bg-slate-800 ${step.color}`}>
+                <div className={`mb-4 inline-block rounded-lg bg-slate-800 p-3 ${step.color}`}>
                   <Icon className="h-6 w-6" />
                 </div>
-
-                {/* Content */}
-                <h3 className="text-lg font-semibold text-white mb-2">{step.title}</h3>
+                <h3 className="mb-2 text-lg font-semibold text-white">{step.title}</h3>
                 <p className="text-sm text-dimtext">{step.description}</p>
-
-                {/* Arrow to next */}
-                {idx < steps.length - 1 && (
-                  <div className="hidden lg:block absolute -right-3 top-1/2 -translate-y-1/2 text-slate-600">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path d="M9 18l6-6-6-6" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                  </div>
-                )}
               </div>
             );
           })}
         </div>
 
-        {/* Bottom CTA */}
         <div className="mt-16 text-center">
-          <p className="text-dimtext mb-4">All powered by AI correlation and automated scanning</p>
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-800/50 border border-slate-700">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-sm text-white font-medium">Pipeline available 24/7</span>
+          <div className="inline-flex items-center gap-2 rounded-full border border-amber-dim bg-amber/10 px-6 py-3">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-amber" />
+            <span className="text-sm font-medium text-white">Pipeline available throughout the lab demo</span>
           </div>
         </div>
       </div>

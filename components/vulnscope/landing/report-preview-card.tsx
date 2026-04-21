@@ -1,71 +1,63 @@
-import { FileText, Download,Eye } from "lucide-react";
+import { Download, Eye, FileText } from "lucide-react";
+
 export default function ReportPreviewCard() {
   return (
-    <section className="py-20 px-4" style={{ backgroundImage: 'linear-gradient(to bottom, rgb(3,7,18) 0%, rgb(15,23,42) 100%)' }}>
-      <div className="max-w-5xl mx-auto">
-        {/* Section header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Professional Security Reports
-          </h2>
-          <p className="text-lg text-dimtext max-w-2xl mx-auto">
-            Beautiful, comprehensive PDF reports with AI-powered insights
+    <section className="px-4 py-20" style={{ backgroundImage: "linear-gradient(to bottom, rgb(3,7,18), rgb(15,23,42))" }}>
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-16 text-center">
+          <h2 className="text-4xl font-bold text-white md:text-5xl">Professional Security Reports</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-dimtext">
+            Executive summary, evidence, OWASP mapping, and AI-assisted remediation in one artifact.
           </p>
         </div>
 
-        {/* Report card preview */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left side - Report content preview */}
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <div className="rounded-lg border border-slate-700 bg-slate-900/50 overflow-hidden shadow-2xl">
-              {/* Report header */}
-              <div className="p-8 border-b border-slate-700" style={{ backgroundImage: 'linear-gradient(to right, rgb(30,41,59) 0%, rgb(15,23,42) 100%)' }}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 rounded-lg bg-blue-600/20">
-                    <FileText className="h-6 w-6 text-blue-400" />
+            <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-900/50 shadow-2xl">
+              <div className="border-b border-slate-700 bg-[linear-gradient(to_right,rgba(232,124,30,0.2),rgba(15,23,42,0.85))] p-8">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="rounded-lg bg-amber/10 p-3">
+                    <FileText className="h-6 w-6 text-amber" />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-white">Security Audit Report</h3>
                     <p className="text-sm text-dimtext">Target: https://example.com</p>
                   </div>
                 </div>
-                <p className="text-dimtext text-sm">Generated on January 20, 2025 • Duration: 4m 32s</p>
+                <p className="text-sm text-dimtext">Generated on January 20, 2026 . Duration: 4m 32s</p>
               </div>
 
-              {/* Report body */}
-              <div className="p-8 space-y-6">
-                {/* Summary */}
+              <div className="space-y-6 p-8">
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-4">Executive Summary</h4>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <h4 className="mb-4 text-lg font-semibold text-white">Executive Summary</h4>
+                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                     {[
-                      { label: "Critical", value: "2", color: "text-red-400" },
-                      { label: "High", value: "3", color: "text-orange-400" },
-                      { label: "Medium", value: "5", color: "text-yellow-400" },
-                      { label: "Low", value: "4", color: "text-blue-400" },
-                    ].map((item, idx) => (
-                      <div key={idx} className="p-4 rounded bg-slate-800/50 border border-slate-700">
+                      { label: "Critical", value: "2", color: "text-red-300" },
+                      { label: "High", value: "3", color: "text-orange-300" },
+                      { label: "Medium", value: "5", color: "text-yellow-300" },
+                      { label: "Low", value: "4", color: "text-cyan" },
+                    ].map((item) => (
+                      <div key={item.label} className="rounded border border-slate-700 bg-slate-800/50 p-4">
                         <p className={`text-2xl font-bold ${item.color}`}>{item.value}</p>
-                        <p className="text-xs text-dimtext mt-1">{item.label} Issues</p>
+                        <p className="mt-1 text-xs text-dimtext">{item.label} Issues</p>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Finding sample */}
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-4">Sample Finding</h4>
-                  <div className="p-4 rounded border border-red-500/30 bg-red-900/10 space-y-3">
+                  <h4 className="mb-4 text-lg font-semibold text-white">Sample Finding</h4>
+                  <div className="space-y-3 rounded border border-red-500/30 bg-red-900/10 p-4">
                     <div className="flex items-center justify-between">
                       <p className="font-semibold text-white">SQL Injection in Login Form</p>
-                      <span className="px-2.5 py-1 text-xs rounded bg-red-900/50 text-red-400 border border-red-500/30 font-semibold">
+                      <span className="rounded border border-red-500/30 bg-red-900/50 px-2.5 py-1 text-xs font-semibold text-red-300">
                         Critical
                       </span>
                     </div>
-                    <p className="text-sm text-dimtext">Database queries compromised through user input on /login endpoint</p>
-                    <div className="pt-2 border-t border-red-500/20">
-                      <p className="text-xs text-dimtext mb-2 font-semibold">AI-Generated Fix:</p>
-                      <pre className="bg-slate-950/50 p-2 rounded text-xs text-green-400/70 overflow-x-auto">
+                    <p className="text-sm text-dimtext">Database queries compromised through user input on the login endpoint.</p>
+                    <div className="border-t border-red-500/20 pt-2">
+                      <p className="mb-2 text-xs font-semibold text-dimtext">AI-Generated Fix</p>
+                      <pre className="overflow-x-auto rounded bg-slate-950/50 p-2 text-xs text-green-300">
 {`$stmt = $conn->prepare("SELECT * FROM users WHERE email=?");
 $stmt->bind_param("s", $_GET['email']);`}
                       </pre>
@@ -76,37 +68,24 @@ $stmt->bind_param("s", $_GET['email']);`}
             </div>
           </div>
 
-          {/* Right side - Features & CTA */}
           <div className="flex flex-col gap-6">
-            {/* Features */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-white">Report Includes</h3>
-              <div className="space-y-3">
-                {[
-                  { icon: "📊", text: "Executive summary" },
-                  { icon: "🔍", text: "Detailed findings" },
-                  { icon: "🛠️", text: "AI fix recommendations" },
-                  { icon: "📋", text: "OWASP mapping" },
-                  { icon: "🔗", text: "References & links" },
-                  { icon: "📸", text: "Evidence & screenshots" },
-                  { icon: "📈", text: "Risk assessment" },
-                  { icon: "✅", text: "Remediation guide" },
-                ].map((item, idx) => (
-                  <div key={idx} className="flex gap-3 items-start">
-                    <span className="text-xl">{item.icon}</span>
-                    <span className="text-sm text-dimtext">{item.text}</span>
-                  </div>
-                ))}
+              <div className="space-y-3 text-sm text-dimtext">
+                <p>Executive summary and severity charts</p>
+                <p>Detailed findings with endpoint evidence</p>
+                <p>AI remediation suggestions and code deltas</p>
+                <p>OWASP mapping and traceable references</p>
+                <p>Risk summary and remediation priorities</p>
               </div>
             </div>
 
-            {/* CTA Buttons */}
-            <div className="space-y-3 pt-4 border-t border-slate-700">
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
+            <div className="space-y-3 border-t border-slate-700 pt-4">
+              <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-amber px-4 py-3 font-semibold text-bg-primary transition-colors hover:bg-amber-glow">
                 <Download className="h-4 w-4" />
                 Download Sample PDF
               </button>
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-lg border border-slate-700 transition-colors">
+              <button className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 font-semibold text-white transition-colors hover:bg-slate-700">
                 <Eye className="h-4 w-4" />
                 View Preview
               </button>

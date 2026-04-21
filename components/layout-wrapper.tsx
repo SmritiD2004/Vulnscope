@@ -1,23 +1,18 @@
+// components/layout-wrapper.tsx (already correct)
 "use client";
 
 import { usePathname } from "next/navigation";
 import Navbar from "./navbar";
 import Footer from "./footer";
 
-interface LayoutWrapperProps {
-  children: React.ReactNode;
-}
-
-export default function LayoutWrapper({ children }: LayoutWrapperProps) {
+export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isDashboard = pathname.startsWith("/dashboard");
 
   if (isDashboard) {
-    // For dashboard routes, only render the children (dashboard layout will handle the rest)
-    return <>{children}</>;
+    return <>{children}</>;  // no navbar/footer on dashboard pages
   }
 
-  // For non-dashboard routes, use the standard layout with navbar and footer
   return (
     <>
       <Navbar />

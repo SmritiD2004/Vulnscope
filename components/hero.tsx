@@ -9,6 +9,7 @@ export default function Hero() {
   const [mouseX, setMouseX] = useState(0);
   const [mouseY, setMouseY] = useState(0);
 
+  
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     setMouseX(e.clientX);
     setMouseY(e.clientY);
